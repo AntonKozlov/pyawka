@@ -1,0 +1,11 @@
+with F[1] == '<P':
+	p = 0
+
+with p:
+	print(F[0])
+
+with F[1] == 'P>':
+	p = 1
+
+with END:
+	print("exit")

@@ -1,0 +1,5 @@
+with p:
+	print(F[0])
+
+with F[1] == 'P>':
+	p = 1
