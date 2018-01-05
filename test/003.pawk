@@ -1,0 +1,15 @@
+
+from math import sqrt
+
+def mysub(x, y):
+	return x - y
+
+class Test:
+	def test(self, x, y):
+		return mysub(x, y) - (x - y)
+
+with mysub(float(F[1]), 0):
+	x = float(F[1])
+	y = float(F[2])
+	print(int(mysub(sqrt(x), y)))
+	assert Test().test(x, y) == 0

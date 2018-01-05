@@ -6,6 +6,12 @@ from collections import defaultdict, ChainMap
 from parseprint import parseprint
 
 class NameTrasformer(ast.NodeTransformer):
+    def visit_FunctionDef(self, node):
+        # do not overwrite names in functions
+        return node
+    def visit_ClassDef(self, node):
+        # do not overwrite names in class defs
+        return node
     def visit_Name(self, node):
         n = ast.copy_location(ast.Subscript(
                 value=ast.copy_location(ast.Name(id='__PYAWKA__', ctx=ast.Load()), node),
@@ -42,8 +48,11 @@ class constdict(defaultdict):
 def dd(fields):
     return defaultdict(lambda: None, enumerate(fields))
 
+def exec1(obj):
+    exec(obj, globals())
+
 def main(prog, inputs):
-    
+
     d = ChainMap(globals(), vars(builtins), constdict(None))
 
     tree = ast.parse(prog)
@@ -54,12 +63,14 @@ def main(prog, inputs):
     t = AwkaTrasformer()
     t.visit(tree)
 
+    exec1(compile(tree, '<pyawka>', 'exec'))
+
     global __PYAWKA__
     __PYAWKA__ = d
     
     begin = t.prog.get('BEGIN')
     if begin:
-        exec(begin)
+        exec1(begin)
 
     cases = t.prog['cases']
 
@@ -74,7 +85,7 @@ def main(prog, inputs):
                 d['F'] = dd([line.strip()] + line.split())
                 for cond, body in cases:
                     if eval(cond):
-                        exec(body)
+                        exec1(body)
         finally:
             if f is not sys.stdin:
                 f.close()
@@ -83,4 +94,4 @@ def main(prog, inputs):
         del d['F']
     end = t.prog.get('END')
     if end:
-        exec(end)
+        exec1(end)
