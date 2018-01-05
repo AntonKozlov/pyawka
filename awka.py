@@ -42,12 +42,11 @@ class constdict(defaultdict):
 def dd(fields):
     return defaultdict(lambda: None, enumerate(fields))
 
-def main(progfile, inputs=['-']):
+def main(prog, inputs):
     
     d = ChainMap(globals(), vars(builtins), constdict(None))
 
-    with open(progfile, "r") as f:
-        tree = ast.parse(f.read())
+    tree = ast.parse(prog)
 
     nt = NameTrasformer()
     nt.visit(tree)
@@ -63,15 +62,25 @@ def main(progfile, inputs=['-']):
         exec(begin)
 
     cases = t.prog['cases']
+
+    if not inputs:
+        inputs = [ '-' ]
+
     for inp in inputs:
-        with open(inp, 'r') as f:
+        try:
+            f = sys.stdin if inp == '-' else open(inp, 'r')
+
             for line in f:
                 d['F'] = dd([line.strip()] + line.split())
                 for cond, body in cases:
                     if eval(cond):
                         exec(body)
+        finally:
+            if f is not sys.stdin:
+                f.close()
 
-    del d['F']
+    if 'F' in d:
+        del d['F']
     end = t.prog.get('END')
     if end:
         exec(end)

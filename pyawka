@@ -1,8 +1,28 @@
 #!/usr/bin/env python3
 
 import sys
+import getopt
+import argparse
 
 from awka import main
 
 if __name__ == '__main__':
-    main(sys.argv[1], sys.argv[2:])
+    if not sys.argv[1:]:
+        print('''PYthon-flavoured AWK\nUsage: %s { -c PROGLINE | PROGFILE } [ INPUTFILES... ]\n''' % (__file__,))
+        sys.exit(1)
+
+    opts, args = getopt.getopt(sys.argv[1:], 'c:')
+
+    prg = None
+    for o, a in opts:
+        if o == '-c': 
+            prg = a
+        else:
+            assert False, "unhandled option"
+
+    if prg is None:
+        with open(args[0], 'r') as f:
+            prg = f.read()
+        args = args[1:]
+
+    main(prg, args)
