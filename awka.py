@@ -45,7 +45,16 @@ class constdict(defaultdict):
     def __missing__(self, key):
         return self.const
 
-def dd(fields):
+def deduce(x):
+    for f in int, float:
+        try:
+            return f(x)
+        except:
+            pass
+    return x
+
+def fieldstore(line):
+    fields = [ line.rstrip('\n')] + [ deduce(x) for x in line.split() ]
     return defaultdict(lambda: None, enumerate(fields))
 
 def exec1(obj):
@@ -80,9 +89,8 @@ def main(prog, inputs):
     for inp in inputs:
         try:
             f = sys.stdin if inp == '-' else open(inp, 'r')
-
             for line in f:
-                d['F'] = dd([line.strip()] + line.split())
+                d['F'] = fieldstore(line)
                 for cond, body in cases:
                     if eval(cond):
                         exec1(body)

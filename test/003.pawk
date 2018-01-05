@@ -8,8 +8,6 @@ class Test:
 	def test(self, x, y):
 		return mysub(x, y) - (x - y)
 
-with mysub(float(F[1]), 0):
-	x = float(F[1])
-	y = float(F[2])
-	print(int(mysub(sqrt(x), y)))
-	assert Test().test(x, y) == 0
+with mysub(F[1], 0):
+	print(int(mysub(sqrt(F[1]), F[2])))
+	assert Test().test(F[1], F[2]) == 0
